@@ -38,6 +38,24 @@ public class LocalIntegrationTest {
     // Tests.
     // ---------------------------------------------------
 
+
+    @BeforeClass
+    public static void machineConfiguration() {
+        LOG.info("Available processors (cores): " +
+                Runtime.getRuntime().availableProcessors());
+
+        LOG.info("Total memory available to JVM (bytes): " +
+                Runtime.getRuntime().totalMemory());
+
+        long maxMemory = Runtime.getRuntime().maxMemory();
+        LOG.info("Maximum memory the JVM will use (bytes): " +
+                (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory));
+
+        LOG.info("Free memory before submitting queries (bytes): " +
+                Runtime.getRuntime().freeMemory());
+    }
+
+
     @BeforeClass
     public static void setupClusterSimulatorAndClient() {
         clusterSimulator = new LocalClusterSimulator(LocalClusterSimulator.ExecutionMode.EXECUTION_MODE_SINGLE_PROCESS,

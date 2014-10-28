@@ -3,6 +3,7 @@ package de.tuberlin.aura.core.record;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.UnsafeInput;
+import de.tuberlin.aura.core.iosystem.ReusingObjectInstantiatorStrategy;
 import de.tuberlin.aura.core.iosystem.IOEvents;
 import de.tuberlin.aura.core.memory.BufferStream;
 import de.tuberlin.aura.core.memory.MemoryView;
@@ -52,6 +53,12 @@ public class RecordReader implements IRecordReader {
         final int bufferSize = runtime.getProducer().getAllocator().getBufferSize();
 
         this.kryo = new Kryo(null);
+
+        if (this.runtime.getTaskManager().getConfig().getBoolean("tm.io.kryo.object.reusage")
+                && ReusingObjectInstantiatorStrategy.isApplicable(this.runtime.getNodeDescriptor().propertiesList)) {
+
+            this.kryo.setInstantiatorStrategy(new ReusingObjectInstantiatorStrategy(this.kryo.getInstantiatorStrategy()));
+        }
 
         this.inputBufferAccessors = new ArrayList<>();
 

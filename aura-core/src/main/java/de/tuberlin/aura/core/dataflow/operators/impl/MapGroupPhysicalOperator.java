@@ -21,6 +21,10 @@ public class MapGroupPhysicalOperator<I,O> extends AbstractUnaryUDFPhysicalOpera
 
     private Queue<O> elements;
 
+    private OperatorResult<O> operatorResultInstance;
+
+    private OperatorResult<O> endOfGroupMarker;
+
     // ---------------------------------------------------
     // Constructor.
     // ---------------------------------------------------
@@ -32,6 +36,10 @@ public class MapGroupPhysicalOperator<I,O> extends AbstractUnaryUDFPhysicalOpera
         super(context, inputOp, function);
 
         elements = new LinkedList<>();
+
+        operatorResultInstance = new OperatorResult<>();
+
+        endOfGroupMarker = new OperatorResult<>(StreamMarker.END_OF_GROUP_MARKER);
     }
 
     // ---------------------------------------------------
@@ -63,13 +71,15 @@ public class MapGroupPhysicalOperator<I,O> extends AbstractUnaryUDFPhysicalOpera
             }
         }
 
-        OperatorResult<O> result = new OperatorResult<>(elements.poll());
+        O result = elements.poll();
 
-        if (result.element == null) {
-            return new OperatorResult<>(StreamMarker.END_OF_GROUP_MARKER);
+        if (result == null) {
+            return endOfGroupMarker;
         }
 
-        return result;
+        operatorResultInstance.element = result;
+
+        return operatorResultInstance;
     }
 
     @Override

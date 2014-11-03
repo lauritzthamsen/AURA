@@ -17,6 +17,8 @@ public class FoldPhysicalOperator<I,O> extends AbstractUnaryUDFPhysicalOperator<
 
     private Boolean isDrained;
 
+    private OperatorResult<O> operatorResultInstance;
+
     // ---------------------------------------------------
     // Constructor.
     // ---------------------------------------------------
@@ -28,6 +30,8 @@ public class FoldPhysicalOperator<I,O> extends AbstractUnaryUDFPhysicalOperator<
         super(context, inputOp, function);
 
         this.isDrained = false;
+
+        this.operatorResultInstance = new OperatorResult<>();
     }
 
 
@@ -70,7 +74,9 @@ public class FoldPhysicalOperator<I,O> extends AbstractUnaryUDFPhysicalOperator<
             this.isDrained = true;
         }
 
-        return new OperatorResult<>(value);
+        operatorResultInstance.element = value;
+
+        return operatorResultInstance;
     }
 
     @Override

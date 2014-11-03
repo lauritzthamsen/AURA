@@ -31,6 +31,8 @@ public final class HashJoinPhysicalOperator<I1,I2> extends AbstractBinaryPhysica
 
     private final Map<List<Object>,I1> buildSide;
 
+    private OperatorResult<Tuple2<I1,I2>> operatorResultInstance;
+
     // ---------------------------------------------------
     // Constructor.
     // ---------------------------------------------------
@@ -43,6 +45,7 @@ public final class HashJoinPhysicalOperator<I1,I2> extends AbstractBinaryPhysica
 
         this.buildSide = new HashMap<>();
 
+        operatorResultInstance = new OperatorResult<>();
     }
 
     // ---------------------------------------------------
@@ -115,7 +118,14 @@ public final class HashJoinPhysicalOperator<I1,I2> extends AbstractBinaryPhysica
             in1 = buildSide.get(key2);
         }
 
-        return new OperatorResult<>(new Tuple2<>(in1, in2.element));
+        if (operatorResultInstance.element == null) {
+            operatorResultInstance.element = new Tuple2<>(in1, in2.element);
+        } else {
+            operatorResultInstance.element._1 = in1;
+            operatorResultInstance.element._2 = in2.element;
+        }
+
+        return operatorResultInstance;
     }
 
     @Override

@@ -25,6 +25,7 @@ public class GroupByPhysicalOperator<I> extends AbstractUnaryPhysicalOperator<I,
 
     private List<Object> currentGroupKeys;
 
+    private OperatorResult<I> endOfGroupMarker;
 
     // ---------------------------------------------------
     // Constructor.
@@ -34,6 +35,8 @@ public class GroupByPhysicalOperator<I> extends AbstractUnaryPhysicalOperator<I,
                                    final IPhysicalOperator<I> inputOp) {
 
         super(context, inputOp);
+
+        endOfGroupMarker = new OperatorResult<>(StreamMarker.END_OF_GROUP_MARKER);
     }
 
     // ---------------------------------------------------
@@ -86,7 +89,7 @@ public class GroupByPhysicalOperator<I> extends AbstractUnaryPhysicalOperator<I,
                     firstElementOfNewGroup = input;
                     currentGroupKeys = null;
 
-                    return new OperatorResult<>(StreamMarker.END_OF_GROUP_MARKER);
+                    return endOfGroupMarker;
                 }
             }
 

@@ -36,6 +36,8 @@ public class HDFSSourcePhysicalOperator<O> extends AbstractUnaryPhysicalOperator
 
     private AbstractTuple record;
 
+    private OperatorResult<O> operatorResultInstance;
+
     // ---------------------------------------------------
     // Constructor.
     // ---------------------------------------------------
@@ -43,6 +45,8 @@ public class HDFSSourcePhysicalOperator<O> extends AbstractUnaryPhysicalOperator
     public HDFSSourcePhysicalOperator(final IExecutionContext context) {
 
         super(context, null);
+
+        operatorResultInstance = new OperatorResult<>();
     }
 
     // ---------------------------------------------------
@@ -51,6 +55,7 @@ public class HDFSSourcePhysicalOperator<O> extends AbstractUnaryPhysicalOperator
 
     @Override
     public void open() throws Throwable {
+
         super.open();
 
         final Path path = new Path((String)getContext().getProperties().config.get(HDFS_SOURCE_FILE_PATH));
@@ -77,14 +82,17 @@ public class HDFSSourcePhysicalOperator<O> extends AbstractUnaryPhysicalOperator
             inputFormat.close();
             split = (FileInputSplit)getContext().getRuntime().getNextInputSplit();
 
-            if (split == null)
+            if (split == null) {
                 return new OperatorResult<>(StreamMarker.END_OF_STREAM_MARKER);
+            }
 
             inputFormat.open(split);
             inputFormat.nextRecord(record);
         }
 
-        return new OperatorResult<>((O) record);
+        operatorResultInstance.element = (O) record;
+
+        return operatorResultInstance;
     }
 
     @Override

@@ -14,6 +14,12 @@ import static de.tuberlin.aura.core.record.OperatorResult.StreamMarker;
 public class UDFSourcePhysicalOperator<O> extends AbstractUnaryUDFPhysicalOperator<Object,O> {
 
     // ---------------------------------------------------
+    // Fields.
+    // ---------------------------------------------------
+
+    private OperatorResult<O> operatorResultInstance;
+
+    // ---------------------------------------------------
     // Constructor.
     // ---------------------------------------------------
 
@@ -21,6 +27,8 @@ public class UDFSourcePhysicalOperator<O> extends AbstractUnaryUDFPhysicalOperat
                                      final SourceFunction<O> function) {
 
         super(context, null, function);
+
+        operatorResultInstance = new OperatorResult<>();
     }
 
     // ---------------------------------------------------
@@ -35,13 +43,15 @@ public class UDFSourcePhysicalOperator<O> extends AbstractUnaryUDFPhysicalOperat
     @Override
     public OperatorResult<O> next() throws Throwable {
 
-        OperatorResult<O> result = new OperatorResult<>(((ISourceFunction<O>)function).produce());
+        O element = ((ISourceFunction<O>)function).produce();
 
-        if (result.element == null) {
-            result.marker = StreamMarker.END_OF_STREAM_MARKER;
+        if (element == null) {
+            return new OperatorResult<>(StreamMarker.END_OF_STREAM_MARKER);
         }
 
-        return result;
+        operatorResultInstance.element = element;
+
+        return operatorResultInstance;
     }
 
     @Override

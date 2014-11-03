@@ -22,6 +22,8 @@ public final class FlatMapPhysicalOperator<I,O> extends AbstractUnaryUDFPhysical
 
     private Queue<O> elements;
 
+    private OperatorResult<O> operatorResultInstance;
+
     // ---------------------------------------------------
     // Constructor.
     // ---------------------------------------------------
@@ -31,6 +33,8 @@ public final class FlatMapPhysicalOperator<I,O> extends AbstractUnaryUDFPhysical
                                    final FlatMapFunction<I,O> function) {
 
         super(context, inputOp, function);
+
+        operatorResultInstance = new OperatorResult<>();
     }
 
     // ---------------------------------------------------
@@ -52,14 +56,16 @@ public final class FlatMapPhysicalOperator<I,O> extends AbstractUnaryUDFPhysical
         while (elements.isEmpty()) {
             OperatorResult<I> input = inputOp.next();
 
-            if (input.marker != StreamMarker.END_OF_STREAM_MARKER) {
-                ((IFlatMapFunction<I,O>)function).flatMap(input.element, elements);
-            } else {
+            if (input.marker == StreamMarker.END_OF_STREAM_MARKER) {
                 return new OperatorResult<>(StreamMarker.END_OF_STREAM_MARKER);
             }
+
+            ((IFlatMapFunction<I,O>)function).flatMap(input.element, elements);
         }
 
-        return new OperatorResult<>(elements.poll());
+        operatorResultInstance.element = elements.poll();
+
+        return operatorResultInstance;
     }
 
     @Override

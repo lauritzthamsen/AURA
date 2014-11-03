@@ -44,11 +44,8 @@ public class LoopControlPhysicalOperator<I> extends AbstractUnaryPhysicalOperato
     public OperatorResult<I> next() throws Throwable {
 
         if (loopTerminated) {
-
             setOutputGates(Arrays.asList(0));
-
         } else {
-
             setOutputGates(Arrays.asList(1));
         }
 

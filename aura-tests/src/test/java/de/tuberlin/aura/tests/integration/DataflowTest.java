@@ -887,7 +887,6 @@ public final class DataflowTest {
                 c.add(new Tuple2<>("LO", in._2 + 1));
             }
         }
-
     }
 
     public static final class Job1Filter extends FilterFunction<Tuple2<String,Integer>> {
@@ -916,10 +915,11 @@ public final class DataflowTest {
         }
     }
 
-    public static final class Job2Sink extends SinkFunction<Tuple2<Tuple2<Integer, String>, Tuple2<Integer, String>>> {
+
+    public static final class Job2Sink extends SinkFunction<Tuple2<Tuple2<Integer, String>, Tuple2<Tuple2<Integer, String>, Tuple2<Integer, String>>>> {
 
         @Override
-        public void consume(final Tuple2<Tuple2<Integer, String>, Tuple2<Integer, String>> in) {
+        public void consume(final Tuple2<Tuple2<Integer, String>, Tuple2<Tuple2<Integer, String>, Tuple2<Integer, String>>> in) {
 //            System.out.println(in);
         }
     }
@@ -991,7 +991,6 @@ public final class DataflowTest {
     }
 
     public static final class Job5Fold extends FoldFunction<Tuple3<String,Integer,Integer>,Tuple2<String,Integer>> {
-
 
         @Override
         public Tuple2<String, Integer> empty() {

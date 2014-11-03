@@ -26,7 +26,6 @@ public final class SortPhysicalOperator<I> extends AbstractUnaryPhysicalOperator
         @Override
         @SuppressWarnings("unchecked")
         public int compare(final T o1, final T o2) {
-
             for(final int[] selectorChain : properties.sortKeyIndices) {
 
                 final Comparable f1 = (Comparable)properties.input1Type.selectField(selectorChain, o1);
@@ -51,6 +50,8 @@ public final class SortPhysicalOperator<I> extends AbstractUnaryPhysicalOperator
 
     private int index = 0;
 
+    private OperatorResult<I> operatorResultInstance;
+
     // ---------------------------------------------------
     // Constructor.
     // ---------------------------------------------------
@@ -61,6 +62,8 @@ public final class SortPhysicalOperator<I> extends AbstractUnaryPhysicalOperator
         super(context, inputOp);
 
         this.elements = new ArrayList<>();
+
+        this.operatorResultInstance = new OperatorResult<>();
     }
 
     // ---------------------------------------------------
@@ -92,9 +95,9 @@ public final class SortPhysicalOperator<I> extends AbstractUnaryPhysicalOperator
 
     @Override
     public OperatorResult<I> next() throws Throwable {
-
         if (index < elements.size()) {
-            return new OperatorResult<>(elements.get(index++));
+            operatorResultInstance.element = elements.get(index++);
+            return operatorResultInstance;
         } else {
             return new OperatorResult<>(StreamMarker.END_OF_STREAM_MARKER);
         }

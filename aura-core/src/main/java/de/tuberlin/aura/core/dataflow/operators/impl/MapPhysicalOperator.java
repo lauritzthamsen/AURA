@@ -14,6 +14,12 @@ import static de.tuberlin.aura.core.record.OperatorResult.StreamMarker;
 public final class MapPhysicalOperator<I,O> extends AbstractUnaryUDFPhysicalOperator<I,O> {
 
     // ---------------------------------------------------
+    // Fields.
+    // ---------------------------------------------------
+
+    private OperatorResult<O> operatorResultInstance;
+
+    // ---------------------------------------------------
     // Constructor.
     // ---------------------------------------------------
 
@@ -22,6 +28,8 @@ public final class MapPhysicalOperator<I,O> extends AbstractUnaryUDFPhysicalOper
                                final MapFunction<I, O> function) {
 
         super(context, inputOp, function);
+
+        operatorResultInstance = new OperatorResult<>();
     }
 
     // ---------------------------------------------------
@@ -39,11 +47,13 @@ public final class MapPhysicalOperator<I,O> extends AbstractUnaryUDFPhysicalOper
 
         final OperatorResult<I> input = inputOp.next();
 
-        if (input.marker != StreamMarker.END_OF_STREAM_MARKER) {
-            return new OperatorResult<>(((IMapFunction<I,O>)function).map(input.element));
-        } else {
+        if (input.marker == StreamMarker.END_OF_STREAM_MARKER) {
             return new OperatorResult<>(StreamMarker.END_OF_STREAM_MARKER);
         }
+
+        operatorResultInstance.element = ((IMapFunction<I,O>)function).map(input.element);
+
+        return operatorResultInstance;
     }
 
     @Override
